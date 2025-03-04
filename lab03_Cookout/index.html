@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>The Freshmen's Walk to Cookout</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+
+    <!-- Load additional CSS files -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.0.1/dist/leaflet.css" />
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Lora" rel="stylesheet">
+
+    <style>
+        /* Integrated CSS */
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: "Noto Sans", sans-serif;
+            color: #3d3d3d;
+        }
+
+        h1 {
+            position: absolute;
+            top: 10px;
+            left: 20px;
+            font-size: 1.8em;
+            font-family: "Lora", serif;
+            letter-spacing: .04em;
+            padding: 10px 15px;
+            background: rgba(256, 256, 256, 0.9);
+            border: 1px solid grey;
+            border-radius: 3px;
+            z-index: 1000;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .leaflet-top.leaflet-left {
+            right: 10px !important;
+            left: auto !important; /* Moves zoom controls to top right */
+        }
+
+        section {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            width: 300px;
+            padding: 15px;
+            background: rgba(256, 256, 256, 0.9);
+            border: 1px solid grey;
+            border-radius: 3px;
+            z-index: 1000;
+        }
+
+        h2 {
+            font-family: "Lora", serif;
+            letter-spacing: .04em;
+            margin-top: 0;
+        }
+
+        p {
+            font-size: 0.9em;
+            line-height: 1.5em;
+        }
+
+        a {
+            color: #005daa;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>The Freshman's Walk to Cookout</h1>
+
+    <div id="map"></div>
+
+    <section>
+        <h2>About This Map</h2>
+        <p>The Freshman’s Walk to Cookout is a mapping project that highlights a beloved Appalachian State University tradition: the late-night trek from campus to Cookout. When the campus dining halls close, hungry freshmen set out on this journey, braving Boone’s freezing temperatures—even in shorts—for a legendary Cookout tray.</p>
+        
+        <p>The route spans a little over an hour round trip, winding through campus and town as students bond over shared cravings and the thrill of late-night adventures. Cookout, open until 3:00 AM, serves as the ultimate destination, drawing students with its affordable and satisfying fast food.</p>
+
+        <!-- Link now opens in a new tab -->
+        <p>Check out the Cookout menu <a href="https://cookout.com/menu/" target="_blank">Here!</a></p>
+        <p>Andres Lobo</p>
+    </section>
+
+    <!-- Load additional JavaScript files -->
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.0.1/dist/leaflet.js"></script>
+    <script src="data/route.js"></script> <!-- Ensure this file contains your route GeoJSON -->
+
+    <script>
+        // Options for the Leaflet map
+        var options = {
+            center: [36.2092, -81.6765], // Center of the route
+            zoom: 15
+        };
+
+        // Create Leaflet map
+        var map = L.map('map', options);
+
+        // Load Esri World Topo Map as basemap
+        var CartoDB_Positron = L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+            subdomains: 'abcd',
+            maxZoom: 20
+        }).addTo(map);
+
+        // Load route data from route.js
+        var myRoute = L.geoJson(data, {
+            filter: function(feature) {
+                return feature.geometry.type == "LineString";
+            },
+            style: function(feature) {
+                return {
+                    color: "#FF0000", // Red like Cookout's branding
+                    weight: 8, // Slightly thicker for emphasis
+                    opacity: 0.9, // More visible
+                    dashArray: "10, 5" // Dashes to give a road-like effect
+                };
+            }
+        }).addTo(map);
+
+        var myStops = L.geoJson(data, {
+            filter: function(feature) {
+                return feature.geometry.type == "Point";
+            },
+            onEachFeature: function(feature, layer) {
+                layer.bindTooltip(feature.properties['name']);
+            }
+        }).addTo(map);
+    </script>
+
+</body>
+</html>
